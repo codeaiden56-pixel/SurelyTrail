@@ -156,15 +156,21 @@ function TrailLine({ name, positions, isSelected, onSelect }: TrailLineProps) {
 }
 
 export default function TrailMap() {
-  const [selectedTrail, setSelectedTrail] = useState<string | null>(null);
+  const [selectedTrail, setSelectedTrail] = useState<TrailData | null>(null);
   const [trailData, setTrailData] = useState<TrailData[] | null>(null);
 
-  const handleSelect = useCallback((name: string) => {
-    setSelectedTrail(name);
-  }, []);
+  const handleSelect = useCallback(
+    (name: string) => {
+      const result = trailData?.filter((obj) => {
+        return obj.name === name;
+      });
+      setSelectedTrail(result[0]);
+    },
+    [trailData],
+  );
 
   const handleDeselect = useCallback((name: string) => {
-    setSelectedTrail((current) => (current === name ? null : current));
+    setSelectedTrail((current) => (current?.name === name ? null : current));
   }, []);
 
   const onMapChange = useCallback((data: TrailData[]) => {
@@ -195,13 +201,13 @@ export default function TrailMap() {
               key={`${name}-${index}`}
               name={name}
               positions={toLeafletPositions(trail.location.coordinates)}
-              isSelected={name === selectedTrail}
+              isSelected={name === selectedTrail?.name}
               onSelect={handleSelect}
             />
           );
         })}
       </MapContainer>
-      <SlideIn trailName={selectedTrail} onClose={handleDeselect} />
+      <SlideIn trailData={selectedTrail} onClose={handleDeselect} />
     </View>
   );
 }

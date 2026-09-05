@@ -1,26 +1,27 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import TrailData from "./TrailMap.web";
 import SlideInCss from "./SlideIn.module.css";
 
 type propTypes = {
-  trailName: string | null;
+  trailData: any;
   onClose: (name: string) => void;
 };
 
 function SlideIn(props: propTypes) {
-  if (!props.trailName) {
+  if (!props.trailData) {
     return null;
   } else {
     return (
       <div className={SlideInCss.slideInStyle}>
         <button
           onClick={() => {
-            if (props.trailName) props.onClose(props.trailName);
+            if (props.trailData.name) props.onClose(props.trailData.name);
           }}
         >
           <FontAwesomeIcon icon={faXmark} />
         </button>
-        <h1>{props.trailName}</h1>
+        <h1>{props.trailData.name}</h1>
       </div>
     );
   }
