@@ -43,4 +43,4 @@ yarn-error.*
 
 # trail data files
 *.geojson
-osm-cache.json
+osm-cache*.json

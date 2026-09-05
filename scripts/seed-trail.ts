@@ -33,12 +33,18 @@ async function main() {
   } else {
     console.log("Fetching trails from Overpass API...");
     const query = `[out:json][timeout:120];
-(
-  way["highway"="path"]["name"](38.8,-120.1,39.1,-119.8);
-  relation["route"="hiking"]["name"](38.8,-120.1,39.1,-119.8);
-);
-(._;>;);
-out body;`;
+      (
+        way["highway"~"^(path|footway|pedestrian|steps|bridleway|cycleway|track|corridor)$"](38.8,-120.1,39.1,-119.8);
+        relation["route"="hiking"](38.8,-120.1,39.1,-119.8);
+        relation["route"="foot"](38.8,-120.1,39.1,-119.8);
+        relation["route"="bicycle"](38.8,-120.1,39.1,-119.8);
+        relation["route"="horse"](38.8,-120.1,39.1,-119.8);
+      );
+
+      (._;>;);
+
+      out body;
+    `;
 
     const res = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
@@ -68,15 +74,10 @@ out body;`;
   console.log(`Converting to ${lineFeatures.length} trail(s)...`);
 
   let inserted = 0;
-
-  const MAX_COORDS = 500;
-  const smallTrails = lineFeatures.filter(
-    (f) => f.geometry.coordinates.length <= MAX_COORDS,
-  );
-  console.log(`${smallTrails.length} trails have <= ${MAX_COORDS} coordinates`);
-
-  for (const feature of smallTrails) {
-    const name: string = feature.properties?.name || "Unnamed";
+  console.log(`Ingesting ${lineFeatures.length} trails`);
+  let unnamedId = 1;
+  for (const feature of lineFeatures) {
+    const name: string = feature.properties?.name || "Unnamed" + unnamedId++;
     const coords = feature.geometry.coordinates;
     const lngs = coords.map((c) => c[0]);
     const lats = coords.map((c) => c[1]);
