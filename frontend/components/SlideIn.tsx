@@ -13,7 +13,29 @@ import {
   Text,
   ScrollView,
   TextInput,
+  Image,
+  ImageSourcePropType,
 } from "react-native";
+import SaxonCreekTrail from "../assets/saxon-creek-trail.png";
+import TahoeRimTrail from "../assets/tahoe-rim-trail.jpeg";
+import HawleyGradeTrail from "../assets/hawley-grade-trail.jpeg";
+import SaxonConnector from "../assets/saxon-connector.jpeg";
+
+const trailImages: Record<string, ImageSourcePropType> = {
+  "6ac03da8a19dcccc9aee4ac4": SaxonCreekTrail,
+  "6ac03d8ea19dcccc9aee49bb": TahoeRimTrail,
+  "6ac03da8a19dcccc9aee4ac1": HawleyGradeTrail,
+  "6ac03df0a19dcccc9aee5086": SaxonConnector,
+  "6ac03d8ea19dcccc9aee49ba": {
+    uri: "https://cdn.outsideonline.com/wp-content/uploads/2020/09/22/naches-peak-loop-trail-lead_h.jpg?auto=webp&width=3840&quality=75&fit=cover",
+  },
+  "6ac03dcda19dcccc9aee4da3": {
+    uri: "https://cdn.outsideonline.com/wp-content/uploads/2020/09/22/naches-peak-loop-trail-lead_h.jpg?auto=webp&width=3840&quality=75&fit=cover",
+  },
+  "6ac03e22a19dcccc9aee53c9": {
+    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGc1SDdlOPJli7MdbYLpLQjpq-iMNAh7RYwYpiR2cOUw&s",
+  },
+};
 
 type propTypes = {
   selectedTrail: TrailData | null;
@@ -91,6 +113,14 @@ function SlideIn(props: propTypes) {
         <Text style={styles.description}>
           {generateDescription(props.selectedTrail) || "no description"}
         </Text>
+        <Image
+          style={styles.image}
+          source={
+            trailImages[props.selectedTrail._id] ?? {
+              uri: "https://fastly.picsum.photos/id/308/600/400.jpg?hmac=7OkFoJc-gMzMAs3LRlECDU18iS2aLizfB0AzcRNpl1A",
+            }
+          }
+        />
       </View>
     );
   }
@@ -114,6 +144,14 @@ function SlideIn(props: propTypes) {
             }}
           >
             <Text>{trail.name}</Text>
+            <Image
+              style={styles.image}
+              source={
+                trailImages[trail._id] ?? {
+                  uri: "https://fastly.picsum.photos/id/308/600/400.jpg?hmac=7OkFoJc-gMzMAs3LRlECDU18iS2aLizfB0AzcRNpl1A",
+                }
+              }
+            />
           </Pressable>
         ))}
       </ScrollView>
@@ -163,6 +201,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "lightgrey",
     borderRadius: 4,
+  },
+  image: {
+    width: "100%",
+    height: 180,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  thumbnailImage: {
+    width: "100%",
+    height: 150,
+    borderRadius: 4,
+    marginTop: 8,
   },
 });
 
