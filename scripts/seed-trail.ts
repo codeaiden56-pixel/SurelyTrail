@@ -32,19 +32,24 @@ async function main() {
     osmData = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
   } else {
     console.log("Fetching trails from Overpass API...");
-    const query = `[out:json][timeout:120];
-      (
-        way["highway"~"^(path|footway|pedestrian|steps|bridleway|cycleway|track|corridor)$"](38.8,-120.1,39.1,-119.8);
-        relation["route"="hiking"](38.8,-120.1,39.1,-119.8);
-        relation["route"="foot"](38.8,-120.1,39.1,-119.8);
-        relation["route"="bicycle"](38.8,-120.1,39.1,-119.8);
-        relation["route"="horse"](38.8,-120.1,39.1,-119.8);
-      );
 
-      (._;>;);
-
-      out body;
-    `;
+    const query = `
+[out:json][timeout:120];
+(
+  way["highway"~"^(path|footway|pedestrian|steps|bridleway|cycleway|track|corridor)$"]
+    (38.8,-120.1,39.1,-119.8);
+  relation["route"="hiking"]
+    (38.8,-120.1,39.1,-119.8);
+  relation["route"="foot"]
+    (38.8,-120.1,39.1,-119.8);
+  relation["route"="bicycle"]
+    (38.8,-120.1,39.1,-119.8);
+  relation["route"="horse"]
+    (38.8,-120.1,39.1,-119.8);
+);
+(._;>;);
+out body;
+`;
 
     const res = await fetch("https://overpass-api.de/api/interpreter", {
       method: "POST",
@@ -77,11 +82,10 @@ async function main() {
   console.log(`Ingesting ${lineFeatures.length} trails`);
 
   for (const feature of lineFeatures) {
-
     if (feature.properties?.name === undefined) {
       continue;
     }
-    
+
     const name: string = feature.properties?.name;
 
     const coords: [number, number][] = feature.geometry.coordinates.map(
