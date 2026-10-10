@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import {
+  AttributionControl,
   MapContainer,
   Polyline,
   TileLayer,
@@ -209,7 +210,9 @@ export default function TrailMap() {
         center={[39.09, -120.03]}
         zoom={10}
         style={{ width: "100%", height: "100%" }}
+        attributionControl={false}
       >
+        <AttributionControl position="bottomleft" />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url={WEB_TILE_URL}

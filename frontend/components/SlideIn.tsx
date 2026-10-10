@@ -22,19 +22,20 @@ import HawleyGradeTrail from "../assets/hawley-grade-trail.jpeg";
 import SaxonConnector from "../assets/saxon-connector.jpeg";
 
 const trailImages: Record<string, ImageSourcePropType> = {
-  "6ac03da8a19dcccc9aee4ac4": SaxonCreekTrail,
-  "6ac03d8ea19dcccc9aee49bb": TahoeRimTrail,
-  "6ac03da8a19dcccc9aee4ac1": HawleyGradeTrail,
-  "6ac03df0a19dcccc9aee5086": SaxonConnector,
-  "6ac03d8ea19dcccc9aee49ba": {
+  "Saxon Creek Trail": SaxonCreekTrail,
+  "Tahoe Rim Trail": TahoeRimTrail,
+  "Hawley Grade National Recreation Trail": HawleyGradeTrail,
+  "Saxon Connector": SaxonConnector,
+  "Pacific Crest Trail": {
     uri: "https://cdn.outsideonline.com/wp-content/uploads/2020/09/22/naches-peak-loop-trail-lead_h.jpg?auto=webp&width=3840&quality=75&fit=cover",
   },
-  "6ac03dcda19dcccc9aee4da3": {
-    uri: "https://cdn.outsideonline.com/wp-content/uploads/2020/09/22/naches-peak-loop-trail-lead_h.jpg?auto=webp&width=3840&quality=75&fit=cover",
-  },
-  "6ac03e22a19dcccc9aee53c9": {
-    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGc1SDdlOPJli7MdbYLpLQjpq-iMNAh7RYwYpiR2cOUw&s",
-  },
+};
+
+const trailDescriptions: Record<string, string> = {
+  "Saxon Creek Trail":
+    "Saxon Creek Trail (a.k.a Mr. Toads Wild Ride) is a popular trail in Tahoe. Many professional mountain bikers ride down hill (south to north) and enjoy many tricky obstacles and curves.",
+  "Hawley Grade National Recreation Trail":
+    "Hawley Grade National Recreation Trail offers a nice hike up to Echo Summit. On the way, you can enjoy a nice view of the valley, other mountains, and a waterfall.",
 };
 
 type propTypes = {
@@ -52,31 +53,29 @@ function SlideIn(props: propTypes) {
     return null;
   }
 
-  const generateDescription = (trailData: TrailData) => {
+  const getTime = (trailData: TrailData) => {
     const avgWalkSpeed = 3.5;
-
     const distanceInKm = trailData.distance / 1000;
     const estimatedTime = distanceInKm / avgWalkSpeed;
 
-    let estimatedTimeString = "";
-
     if (estimatedTime < 1) {
       const minutes = Math.round(estimatedTime * 60);
-      estimatedTimeString = `${minutes} minutes`;
-    } else {
-      const hours = Math.floor(estimatedTime);
-      const minutes = Math.round((estimatedTime - hours) * 60);
-
-      if (minutes === 0) {
-        estimatedTimeString = `${hours} hour${hours !== 1 ? "s" : ""}`;
-      } else {
-        estimatedTimeString = `${hours} hour${hours !== 1 ? "s" : ""} ${minutes} minutes`;
-      }
+      return `${minutes} minutes`;
     }
 
-    const description = `${trailData.name} is a ${distanceInKm.toFixed(1)} km trail that takes an estimated ${estimatedTimeString} to complete.`;
+    const hours = Math.floor(estimatedTime);
+    const minutes = Math.round((estimatedTime - hours) * 60);
 
-    return description;
+    if (minutes === 0) {
+      return `${hours} hour${hours !== 1 ? "s" : ""}`;
+    }
+
+    return `${hours} hour${hours !== 1 ? "s" : ""} ${minutes} minutes`;
+  };
+
+  const getDistance = (trailData: TrailData) => {
+    const distanceInKm = trailData.distance / 1000;
+    return distanceInKm.toFixed(1);
   };
 
   const filterTrails = (searchTerm: string, trails: TrailData[]) => {
@@ -110,13 +109,23 @@ function SlideIn(props: propTypes) {
           </Pressable>
         </View>
         <Text style={styles.title}>{props.selectedTrail.name}</Text>
-        <Text style={styles.description}>
-          {generateDescription(props.selectedTrail) || "no description"}
+        <View style={styles.statsRow}>
+          <Text style={styles.fact}>
+            <Text style={styles.factLabel}>Distance: </Text>
+            {getDistance(props.selectedTrail)} km
+          </Text>
+          <Text style={styles.fact}>
+            <Text style={styles.factLabel}>Est. Time: </Text>
+            {getTime(props.selectedTrail)}
+          </Text>
+        </View>
+        <Text style={styles.descriptionText}>
+          {trailDescriptions[props.selectedTrail.name] ?? "no description"}
         </Text>
         <Image
           style={styles.image}
           source={
-            trailImages[props.selectedTrail._id] ?? {
+            trailImages[props.selectedTrail.name] ?? {
               uri: "https://fastly.picsum.photos/id/308/600/400.jpg?hmac=7OkFoJc-gMzMAs3LRlECDU18iS2aLizfB0AzcRNpl1A",
             }
           }
@@ -147,7 +156,7 @@ function SlideIn(props: propTypes) {
             <Image
               style={styles.image}
               source={
-                trailImages[trail._id] ?? {
+                trailImages[trail.name] ?? {
                   uri: "https://fastly.picsum.photos/id/308/600/400.jpg?hmac=7OkFoJc-gMzMAs3LRlECDU18iS2aLizfB0AzcRNpl1A",
                 }
               }
@@ -161,13 +170,11 @@ function SlideIn(props: propTypes) {
 
 const styles = StyleSheet.create({
   container: {
-    margin: 20,
     position: "absolute",
-    borderRadius: 20,
     top: 0,
     right: 0,
     height: "100%",
-    width: 320,
+    width: 370,
     zIndex: 1000,
     backgroundColor: "white",
     padding: 24,
@@ -185,8 +192,24 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "600",
   },
-  description: {
-    marginTop: 16,
+  statsRow: {
+    marginTop: 12,
+    marginBottom: 16,
+    gap: 6,
+  },
+  fact: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#444",
+  },
+  factLabel: {
+    fontWeight: "700",
+    color: "#222",
+  },
+  descriptionText: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#555",
   },
   topRow: {
     flexDirection: "row",
