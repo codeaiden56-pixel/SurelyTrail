@@ -38,6 +38,24 @@ const trailDescriptions: Record<string, string> = {
     "Hawley Grade National Recreation Trail offers a nice hike up to Echo Summit. On the way, you can enjoy a nice view of the valley, other mountains, and a waterfall.",
 };
 
+// Testing only: keep these routes on the map, but leave them out of the sidebar list.
+const SIDEBAR_HIDDEN_NAME = /pacific crest|\bpct\b|tahoe rim/i;
+
+function isHiddenFromSidebar(trail: TrailData) {
+  return SIDEBAR_HIDDEN_NAME.test(trail.name);
+}
+
+function sortTrails(trails: TrailData[]) {
+  return [...trails].sort((a, b) => {
+    const byName = a.name.localeCompare(b.name, "en", {
+      sensitivity: "base",
+      numeric: true,
+    });
+    if (byName !== 0) return byName;
+    return a._id.localeCompare(b._id);
+  });
+}
+
 type propTypes = {
   selectedTrail: TrailData | null;
   displayedTrails: TrailData[] | null;
@@ -79,9 +97,14 @@ function SlideIn(props: propTypes) {
   };
 
   const filterTrails = (searchTerm: string, trails: TrailData[]) => {
-    return trails.filter((trail) => {
-      return trail.name.toLowerCase().includes(searchTerm.toLowerCase());
-    });
+    const term = searchTerm.toLowerCase();
+    return sortTrails(
+      trails.filter(
+        (trail) =>
+          !isHiddenFromSidebar(trail) &&
+          trail.name.toLowerCase().includes(term),
+      ),
+    );
   };
 
   if (props.selectedTrail) {
@@ -133,6 +156,9 @@ function SlideIn(props: propTypes) {
       </View>
     );
   }
+
+  const visibleTrails = filterTrails(searchTerm, props.displayedTrails);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trails</Text>
@@ -142,9 +168,9 @@ function SlideIn(props: propTypes) {
         value={searchTerm}
         onChangeText={setSearchTerm}
       ></TextInput>
-      {props.displayedTrails.length === 0 && <Text>No trails found</Text>}
+      {visibleTrails.length === 0 && <Text>No trails found</Text>}
       <ScrollView showsVerticalScrollIndicator={false}>
-        {filterTrails(searchTerm, props.displayedTrails).map((trail) => (
+        {visibleTrails.map((trail) => (
           <Pressable
             key={trail._id}
             style={styles.shownTrailContainer}
