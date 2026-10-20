@@ -54,32 +54,12 @@ app.get("/", (_req, res) => {
 </html>`);
     return;
   }
-
   res.sendFile(frontendIndex);
 });
 
-app.get("/queryTrails", async (req, res) => {
-  const searchArea = {
-    type: "Polygon",
-    coordinates: [
-      [
-        [req.query.swlng, req.query.nelat], // NW (top-left)
-        [req.query.nelng, req.query.nelat], // NE (top-right)
-        [req.query.nelng, req.query.swlat], // SE (bottom-right)
-        [req.query.swlng, req.query.swlat], // SW (bottom-left)
-        [req.query.swlng, req.query.nelat], // close the ring (same as first)
-      ],
-    ],
-  };
-
-  const nearbyTrails = await Trail.find({
-    location: {
-      $geoIntersects: {
-        $geometry: searchArea,
-      },
-    },
-  }).lean();
-  res.json(nearbyTrails);
+app.get("/queryTrails", async (_req, res) => {
+  const trails = await Trail.find().lean();
+  res.json(trails);
 });
 
 async function start() {

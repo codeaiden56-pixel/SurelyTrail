@@ -88,9 +88,13 @@ out body;
 
     const name: string = feature.properties?.name;
 
-    const coords: [number, number][] = feature.geometry.coordinates.map(
-      ([lng, lat]) => [lng, lat],
-    );
+    const coords: [number, number][] = feature.geometry.coordinates
+      .filter(([lng, lat]) => Number.isFinite(lng) && Number.isFinite(lat))
+      .map(([lng, lat]) => [lng, lat] as [number, number]);
+
+    if (coords.length < 2) {
+      continue;
+    }
 
     const lngs = coords.map((c) => c[0]);
     const lats = coords.map((c) => c[1]);

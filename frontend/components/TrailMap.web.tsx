@@ -74,21 +74,17 @@ function MapEventHandler({
       nelat: bounds.getNorth(),
       nelng: bounds.getEast(),
     });
+  }, [map]);
 
-    fetch(
-      `${API_URL}/queryTrails?swlat=${bounds.getSouth()}&swlng=${bounds.getWest()}&nelat=${bounds.getNorth()}&nelng=${bounds.getEast()}`,
-    )
+  useEffect(() => {
+    fetch(`${API_URL}/queryTrails`)
       .then(async (response) => {
         return response.json();
       })
       .then((data) => {
         onMapChange(data);
       });
-  }, [map, onMapChange]);
-
-  useEffect(() => {
-    queryTrails();
-  }, [map, onMapChange, queryTrails]);
+  }, []);
 
   useEffect(() => {
     if (params.swlat && params.swlng && params.nelat && params.nelng) {
