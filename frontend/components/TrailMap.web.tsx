@@ -6,12 +6,14 @@ import {
   MapContainer,
   Polyline,
   TileLayer,
+  Tooltip,
   useMap,
   useMapEvents,
 } from "react-leaflet";
 import type { LatLngExpression, Polyline as LeafletPolyline } from "leaflet";
 
 import "leaflet/dist/leaflet.css";
+import "./trail-tooltip.css";
 import SlideIn from "./SlideIn";
 
 import {
@@ -119,20 +121,21 @@ function MapEventHandler({
 }
 
 type TrailLineProps = {
-  name: string;
+  id: string;
+  label: string;
   positions: LatLngExpression[];
   isSelected: boolean;
-  onSelect: (name: string) => void;
+  onSelect: (id: string) => void;
 };
 
-function TrailLine({ name, positions, isSelected, onSelect }: TrailLineProps) {
+function TrailLine({ id, label, positions, isSelected, onSelect }: TrailLineProps) {
   const bindTrailLayer = useCallback(
     (layer: LeafletPolyline | null) => {
       if (layer) {
-        (layer as TrailPolyline).trailName = name;
+        (layer as TrailPolyline).trailName = id;
       }
     },
-    [name],
+    [id],
   );
 
   return (
@@ -145,12 +148,12 @@ function TrailLine({ name, positions, isSelected, onSelect }: TrailLineProps) {
         opacity: 1,
       }}
       eventHandlers={{
-        click: () => onSelect(name),
+        click: () => onSelect(id),
       }}
     >
-      {/* <Popup closeOnClick={false} closeOnEscapeKey={false}>
-        <strong>{name}</strong>
-      </Popup> */}
+      <Tooltip className="trail-hover-tooltip" sticky>
+        {label}
+      </Tooltip>
     </Polyline>
   );
 }
@@ -227,7 +230,8 @@ export default function TrailMap() {
           return (
             <TrailLine
               key={id}
-              name={id}
+              id={id}
+              label={trail.name}
               positions={toLeafletPositions(trail.location.coordinates)}
               isSelected={id === selectedTrail?._id}
               onSelect={handleSelect}

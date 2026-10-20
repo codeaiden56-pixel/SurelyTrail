@@ -5,7 +5,7 @@ export const INITIAL_REGION = {
   longitudeDelta: 0.4,
 };
 
-export const TRAIL_COLOR = "#a8a8a8";
+export const TRAIL_COLOR = "#8a8a8a";
 export const SELECTED_TRAIL_COLOR = "#3fab43";
 export const TRAIL_WIDTH = 3;
 export const SELECTED_TRAIL_WIDTH = 6;
