@@ -124,7 +124,13 @@ type TrailLineProps = {
   onSelect: (id: string) => void;
 };
 
-function TrailLine({ id, label, positions, isSelected, onSelect }: TrailLineProps) {
+function TrailLine({
+  id,
+  label,
+  positions,
+  isSelected,
+  onSelect,
+}: TrailLineProps) {
   const bindTrailLayer = useCallback(
     (layer: LeafletPolyline | null) => {
       if (layer) {
@@ -161,16 +167,6 @@ export default function TrailMap() {
     return trailData?.find((t) => t._id === params.trail) ?? null;
   });
 
-  const handleSelect = useCallback(
-    (id: string) => {
-      const match = trailData?.find((t) => t._id === id);
-      if (!match) return;
-      setSelectedTrail(match);
-      router.setParams({ trail: id });
-    },
-    [trailData],
-  );
-
   const handleDeselect = useCallback((_id: string) => {
     setSelectedTrail(null);
     router.setParams({ trail: undefined });
@@ -184,7 +180,7 @@ export default function TrailMap() {
     [params.trail],
   );
 
-  const center = useCallback(() => {
+  const center = useCallback((selectedTrail: TrailData | null) => {
     const centerPoint: [number, number] | undefined =
       selectedTrail?.location.coordinates[
         Math.floor(selectedTrail.location.coordinates.length / 2)
@@ -201,7 +197,17 @@ export default function TrailMap() {
         nelng: east,
       });
     }
-  }, [selectedTrail]);
+  }, []);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      const match = trailData?.find((t) => t._id === id);
+      if (!match) return;
+      setSelectedTrail(match);
+      center(match);
+    },
+    [center, trailData],
+  );
 
   return (
     <View style={styles.container}>

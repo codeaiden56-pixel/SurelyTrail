@@ -61,7 +61,7 @@ type propTypes = {
   displayedTrails: TrailData[] | null;
   handleDeselect: (id: string) => void;
   handleSelect: (id: string) => void;
-  center: () => void;
+  center: (selectedTrail: TrailData | null) => void;
 };
 
 function SlideIn(props: propTypes) {
@@ -120,7 +120,7 @@ function SlideIn(props: propTypes) {
           >
             <FontAwesomeIcon icon={faXmark} />
           </Pressable>
-          <Pressable onPress={props.center}>
+          <Pressable onPress={() => props.center(props.selectedTrail)}>
             <FontAwesomeIcon icon={faArrowsToCircle} />
           </Pressable>
           <Pressable
