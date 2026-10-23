@@ -30,6 +30,15 @@ const trailImages: Record<string, ImageSourcePropType> = {
   "Pacific Crest Trail": {
     uri: "https://cdn.outsideonline.com/wp-content/uploads/2020/09/22/naches-peak-loop-trail-lead_h.jpg?auto=webp&width=3840&quality=75&fit=cover",
   },
+  "Appaloosa Trail": {
+    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLGmT7q_JKY_DjWsq-9x2n1_6VIUN8QVdwg9HdtE0Xfg&s=10",
+  },
+  "Angora Lake Trail": {
+    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPkY1oF_V8-V6tdK53Ufx7Ila2S69Mm1eBP9tjGdq3gA&s=10",
+  },
+  "Angora Ridge Trail": {
+    uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrT7FG3lkdCdiex-ZEG8GdH_6D2KbangL4BVczNGsuCA&s=10",
+  },
 };
 
 const trailDescriptions: Record<string, string> = {
@@ -173,8 +182,16 @@ function SlideIn(props: propTypes) {
     );
   }
 
-  const visibleTrails = filterTrails(searchTerm, props.displayedTrails);
-
+  // let visibleTrails = filterTrails(searchTerm, props.displayedTrails);
+  // console.log(visibleTrails);
+  const goodTrails = [
+    "6adabee66220fa1f16d9cea1",
+    "6adabe8f6220fa1f16d9c7e8",
+    "6adabe926220fa1f16d9c81f",
+  ];
+  const visibleTrails = searchTerm
+    ? filterTrails(searchTerm, props.displayedTrails)
+    : props.displayedTrails.filter((e) => goodTrails.includes(e._id));
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Trails</Text>
