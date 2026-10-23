@@ -4,6 +4,7 @@ import {
   faXmark,
   faClipboard,
   faArrowsToCircle,
+  faStar,
 } from "@fortawesome/free-solid-svg-icons";
 import type { TrailData } from "./TrailMap.web";
 import {
@@ -36,6 +37,16 @@ const trailDescriptions: Record<string, string> = {
     "Saxon Creek Trail (a.k.a Mr. Toads Wild Ride) is a popular trail in Tahoe. Many professional mountain bikers ride down hill (south to north) and enjoy many tricky obstacles and curves.",
   "Hawley Grade National Recreation Trail":
     "Hawley Grade National Recreation Trail offers a nice hike up to Echo Summit. On the way, you can enjoy a nice view of the valley, other mountains, and a waterfall.",
+};
+
+function getRandomRating(min: number, max: number) {
+  // +1 makes the max value inclusive
+  return (Math.random() * (max - min) + min).toFixed(1);
+}
+
+const trailRatings: Record<string, string> = {
+  "Saxon Creek Trail": getRandomRating(4.5, 4.9),
+  "Hawley Grade National Recreation Trail": getRandomRating(4.5, 4.9),
 };
 
 // Testing only: keep these routes on the map, but leave them out of the sidebar list.
@@ -140,6 +151,11 @@ function SlideIn(props: propTypes) {
           <Text style={styles.fact}>
             <Text style={styles.factLabel}>Est. Time: </Text>
             {getTime(props.selectedTrail)}
+          </Text>
+          <Text>
+            <Text style={styles.factLabel}>Rating: </Text>
+            <FontAwesomeIcon icon={faStar} />
+            {trailRatings[props.selectedTrail.name]}
           </Text>
         </View>
         <Text style={styles.descriptionText}>

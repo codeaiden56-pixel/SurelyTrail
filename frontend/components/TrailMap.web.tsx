@@ -204,6 +204,7 @@ export default function TrailMap() {
       const match = trailData?.find((t) => t._id === id);
       if (!match) return;
       setSelectedTrail(match);
+      router.setParams({ trail: match._id });
       center(match);
     },
     [center, trailData],
