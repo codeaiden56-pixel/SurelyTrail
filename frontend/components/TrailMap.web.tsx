@@ -2,16 +2,18 @@ import { useCallback, useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { router, useGlobalSearchParams } from "expo-router";
 import {
+  AttributionControl,
   MapContainer,
   Polyline,
-  Popup,
   TileLayer,
+  Tooltip,
   useMap,
   useMapEvents,
 } from "react-leaflet";
 import type { LatLngExpression, Polyline as LeafletPolyline } from "leaflet";
 
 import "leaflet/dist/leaflet.css";
+import "./trail-tooltip.css";
 import SlideIn from "./SlideIn";
 
 import {
@@ -19,7 +21,6 @@ import {
   SELECTED_TRAIL_WIDTH,
   TRAIL_COLOR,
   TRAIL_WIDTH,
-  WEB_TILE_SUBDOMAINS,
   WEB_TILE_URL,
 } from "../constants/map";
 
@@ -27,7 +28,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL ?? "";
 
 type TrailPolyline = LeafletPolyline & { trailName?: string };
 
-type TrailData = {
+export type TrailData = {
   bounds: { north: number; south: number; east: number; west: number };
   createdAt: string;
   description: string;
@@ -73,20 +74,17 @@ function MapEventHandler({
       nelat: bounds.getNorth(),
       nelng: bounds.getEast(),
     });
-    fetch(
-      `${API_URL}/queryTrails?swlat=${bounds.getSouth()}&swlng=${bounds.getWest()}&nelat=${bounds.getNorth()}&nelng=${bounds.getEast()}`,
-    )
+  }, [map]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/queryTrails`)
       .then(async (response) => {
         return response.json();
       })
       .then((data) => {
         onMapChange(data);
       });
-  }, [map, onMapChange]);
-
-  useEffect(() => {
-    queryTrails();
-  }, [map, onMapChange, queryTrails]);
+  }, []);
 
   useEffect(() => {
     if (params.swlat && params.swlng && params.nelat && params.nelng) {
@@ -119,20 +117,27 @@ function MapEventHandler({
 }
 
 type TrailLineProps = {
-  name: string;
+  id: string;
+  label: string;
   positions: LatLngExpression[];
   isSelected: boolean;
-  onSelect: (name: string) => void;
+  onSelect: (id: string) => void;
 };
 
-function TrailLine({ name, positions, isSelected, onSelect }: TrailLineProps) {
+function TrailLine({
+  id,
+  label,
+  positions,
+  isSelected,
+  onSelect,
+}: TrailLineProps) {
   const bindTrailLayer = useCallback(
     (layer: LeafletPolyline | null) => {
       if (layer) {
-        (layer as TrailPolyline).trailName = name;
+        (layer as TrailPolyline).trailName = id;
       }
     },
-    [name],
+    [id],
   );
 
   return (
@@ -145,37 +150,65 @@ function TrailLine({ name, positions, isSelected, onSelect }: TrailLineProps) {
         opacity: 1,
       }}
       eventHandlers={{
-        click: () => onSelect(name),
+        click: () => onSelect(id),
       }}
     >
-      {/* <Popup closeOnClick={false} closeOnEscapeKey={false}>
-        <strong>{name}</strong>
-      </Popup> */}
+      <Tooltip className="trail-hover-tooltip" sticky>
+        {label}
+      </Tooltip>
     </Polyline>
   );
 }
 
 export default function TrailMap() {
-  const [selectedTrail, setSelectedTrail] = useState<TrailData | null>(null);
   const [trailData, setTrailData] = useState<TrailData[] | null>(null);
+  const params = useGlobalSearchParams<{ trail?: string }>();
+  const [selectedTrail, setSelectedTrail] = useState<TrailData | null>(() => {
+    return trailData?.find((t) => t._id === params.trail) ?? null;
+  });
 
-  const handleSelect = useCallback(
-    (name: string) => {
-      const result = trailData?.filter((obj) => {
-        return obj.name === name;
-      });
-      setSelectedTrail(result[0]);
+  const handleDeselect = useCallback((_id: string) => {
+    setSelectedTrail(null);
+    router.setParams({ trail: undefined });
+  }, []);
+
+  const onMapChange = useCallback(
+    (data: TrailData[]) => {
+      setTrailData(data);
+      setSelectedTrail(data?.find((t) => t._id === params.trail) ?? null);
     },
-    [trailData],
+    [params.trail],
   );
 
-  const handleDeselect = useCallback((name: string) => {
-    setSelectedTrail((current) => (current?.name === name ? null : current));
+  const center = useCallback((selectedTrail: TrailData | null) => {
+    const centerPoint: [number, number] | undefined =
+      selectedTrail?.location.coordinates[
+        Math.floor(selectedTrail.location.coordinates.length / 2)
+      ];
+    if (centerPoint) {
+      const west = centerPoint[0] - 0.0125;
+      const east = centerPoint[0] + 0.0125;
+      const north = centerPoint[1] + 0.0375;
+      const south = centerPoint[1] - 0.0375;
+      router.setParams({
+        swlat: south,
+        swlng: west,
+        nelat: north,
+        nelng: east,
+      });
+    }
   }, []);
 
-  const onMapChange = useCallback((data: TrailData[]) => {
-    setTrailData(data);
-  }, []);
+  const handleSelect = useCallback(
+    (id: string) => {
+      const match = trailData?.find((t) => t._id === id);
+      if (!match) return;
+      setSelectedTrail(match);
+      router.setParams({ trail: match._id });
+      center(match);
+    },
+    [center, trailData],
+  );
 
   return (
     <View style={styles.container}>
@@ -183,31 +216,39 @@ export default function TrailMap() {
         center={[39.09, -120.03]}
         zoom={10}
         style={{ width: "100%", height: "100%" }}
+        attributionControl={false}
       >
+        <AttributionControl position="bottomleft" />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url={WEB_TILE_URL}
-          subdomains={WEB_TILE_SUBDOMAINS}
           maxZoom={19}
         />
         <MapEventHandler
           onDeselect={handleDeselect}
           onMapChange={onMapChange}
         />
-        {trailData?.map((trail, index) => {
-          const name = trail.name;
+        {trailData?.map((trail) => {
+          const id = trail._id;
           return (
             <TrailLine
-              key={`${name}-${index}`}
-              name={name}
+              key={id}
+              id={id}
+              label={trail.name}
               positions={toLeafletPositions(trail.location.coordinates)}
-              isSelected={name === selectedTrail?.name}
+              isSelected={id === selectedTrail?._id}
               onSelect={handleSelect}
             />
           );
         })}
       </MapContainer>
-      <SlideIn trailData={selectedTrail} onClose={handleDeselect} />
+      <SlideIn
+        selectedTrail={selectedTrail}
+        displayedTrails={trailData}
+        handleDeselect={handleDeselect}
+        handleSelect={handleSelect}
+        center={center}
+      />
     </View>
   );
 }
