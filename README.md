@@ -1,230 +1,70 @@
 # SurelyTrail
 
-## Overview
+**SurelyTrail** is a free trail discovery and navigation app for hikers. No subscriptions. No paywalled maps. Built to make outdoor exploration accessible to everyone. Powered by [OpenStreetMap](https://www.openstreetmap.org) data.
 
-SurelyTrail is a free trail discovery and navigation platform designed to make hiking more accessible. Many existing hiking platforms lock useful features behind subscriptions, creating barriers for casual hikers and outdoor enthusiasts.
+<p align="center">
+  <img src="frontend/assets/tahoe-rim-trail.jpeg" alt="Trail near Lake Tahoe" width="70%" />
+</p>
 
-Our goal is to provide an easy-to-use application that helps people discover, explore, and share hiking trails without requiring a paid membership.
+## Features
 
----
+SurelyTrail is the companion app for hikers who just want to find a trail and go:
 
-## Problem
+- Detailed trail maps with paths that often don’t show up elsewhere, thanks to [OpenStreetMap](https://openstreetmap.org)
+- Browse and explore hiking trails on an interactive map
+- Search for trails near you or in a place you’re visiting
+- Tap any trail for distance, difficulty, elevation gain, and estimated time
+- Discover popular and famous routes without digging through forums
+- Plan your next hike with clear trail info up front
+- Works on **iOS**, **Android**, and the **web**
+- Free and open — no ads, no subscription for core features
 
-Many trail discovery platforms:
+## Why SurelyTrail?
 
-* Require paid subscriptions for core features
-* Focus heavily on monetization
-* Create barriers for new hikers
-* Make trail information less accessible
+Most hiking apps bury useful features behind a subscription. SurelyTrail doesn’t.
 
-We believe outdoor recreation should be easy to access for everyone.
+Use it when you want to:
 
----
+- Find a hike without creating an account or paying first
+- See trails on the map instead of scrolling endless lists
+- Get the basics — length, difficulty, elevation — before you leave
+- Rely on open map data instead of locked-down proprietary trails
+- Spend your time outside, not managing another paid membership
 
-## Vision
+SurelyTrail is free from the usual barriers:
 
-Build a platform where users can:
+- No paywall on the map
+- No subscription for trail discovery
+- No ads in the way of finding your route
+- No mandatory account just to look around
+- Focused on hikers, not upselling Pro tiers
 
-* Discover trails anywhere in the world
-* Browse trails on an interactive map
-* Search for nearby hikes
-* Explore famous hiking routes
-* Plan custom hiking adventures
-* Track and save hiking activity
-* Share experiences with the community
+Hiking should be easy to access for everyone — casual walkers, weekend explorers, and lifelong outdoor enthusiasts alike.
 
----
+**Give SurelyTrail a try!**
 
-## Roadmap
+## Coming soon
 
-### Version 0 (MVP)
+- Custom route planning
+- Live hike timer and personal hike history
+- Trail ratings, reviews, and community contributions
+- Broader coverage beyond the first regions
 
-* Browse trails by location (e.g. Lake Tahoe)
-* Interactive map displaying available trails
-* Search for trails in a selected area
-* Click trails directly from the map
-* Preset collections of popular routes
+## Run it locally
 
-### Version 1
+```bash
+git clone https://github.com/guichnicolas-collab/SurelyTrail.git
+cd SurelyTrail
+npm install && npm install --prefix frontend
+cp .env.sample .env   # set MONGO_CONNECTION_STRING
+npm run seed          # optional: load OSM trail data
+npm start
+```
 
-* Trail statistics panel
+## Contributing
 
-  * Estimated hiking time
-  * Distance
-  * Difficulty
-  * Elevation gain
-* Custom route planning
-* Live hike timer
-* Personal hike history
+Contributions welcome — code, bug reports, and trail ideas all help. Open an issue or pull request on [GitHub](https://github.com/guichnicolas-collab/SurelyTrail).
 
-### Version 2
+## License
 
-* Trail ratings
-* User reviews
-* Community contributions
-* Social features
-
----
-
-## Technology Stack
-
-### Frontend
-
-* React Native
-* Single codebase for:
-
-  * iOS
-  * Android
-  * Web
-
-### Mapping
-
-* Leaflet
-* OpenStreetMap
-
-### Data Format
-
-* GeoJSON
-
----
-
-## Similar Applications
-
-* AllTrails
-* Trailforks
-* Gaia GPS
-* Hiking Project
-* Strava
-
-### Inspiration
-
-* Falling Fruit
-
-  * Community-driven map experience
-  * Similar map-based discovery concept
-
----
-
-## Data Sources
-
-### Current Candidate
-
-#### OpenStreetMap (OSM)
-
-Pros:
-
-* Open data
-* Global coverage
-* Existing trail information
-* Active contributor community
-
-Potential concerns:
-
-* Dataset size
-* Data consistency
-* Regional coverage quality
-
----
-
-## Technical Challenges
-
-### Trail Coverage
-
-**Question:** Should SurelyTrail focus on a single region or support all locations?
-
-**Current Direction:** Global coverage.
-
----
-
-### Data Importing
-
-Potential challenge:
-
-* Full OSM Planet dataset is approximately 163 GB
-* Trails represent only a subset of that data
-
-Questions:
-
-* How much of the dataset consists of trails?
-* Can trail data be extracted efficiently?
-* How frequently should updates occur?
-
-Status: TBD
-
----
-
-### Storage
-
-Questions:
-
-* How large will the trail dataset be after extraction?
-* What database architecture is appropriate?
-* How should GeoJSON be stored and indexed?
-
-Status: TBD
-
----
-
-### Performance
-
-Mobile users often have limited bandwidth.
-
-Potential solutions:
-
-* Load trail data based on map viewport
-* Progressive downloading
-* Tile-based data delivery
-* Local caching of previously viewed regions
-
----
-
-### Elevation & Distance Calculations
-
-Questions:
-
-* Can selected APIs provide elevation profiles?
-* Can routes be measured accurately?
-* What additional data sources may be required?
-
-Status: TBD
-
----
-
-### Moderation
-
-Future community features will require moderation for:
-
-* Inappropriate reviews
-* Spam content
-* Harassment
-* Misinformation
-
-Status: TBD
-
----
-
-## Open Questions
-
-* What is the best trail data source?
-* How should offline support work?
-* How should custom routes be stored?
-* Should users be able to submit new trails?
-* What level of moderation is required?
-* How can map data remain lightweight on mobile devices?
-
----
-
-## Research Resources
-
-### Potentially Useful
-
-* OpenStreetMap
-* OpenTrailMap
-* US Forest Service Trail Data
-* USGS Trail Resources
-* National Map Trails Explorer
-* Data.gov Trail Datasets
-
-### Notes
-
-Several trail data sources and GIS tools have been identified for future evaluation. Data quality, licensing, coverage, update frequency, and storage requirements still need investigation before a final architecture decision is made.
+See [LICENSE](LICENSE). Map data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
